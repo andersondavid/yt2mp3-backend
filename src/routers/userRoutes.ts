@@ -5,4 +5,6 @@ const router = Router();
 
 router.post('/start/', UserController.startService);
 
+router.post('/io/', UserController.socket);
+
 export default router;
