@@ -2,8 +2,9 @@ import { Stream } from 'stream';
 import fs from 'fs';
 
 import ffmpeg from '../libs/ffmpeg';
+import { Socket } from 'socket.io';
 
-async function convertToMp3(stream: Stream, fileName: string, socket) {
+async function convertToMp3(stream: Stream, fileName: string, socket: Socket) {
 	const fileConverted = `temp/${fileName}.mp3`;
 
 	try {
@@ -13,9 +14,11 @@ async function convertToMp3(stream: Stream, fileName: string, socket) {
 			.format('mp3')
 			.on('start', () => {
 				console.log('5 - Conversão iniciada!');
+				socket.emit('loading_audio', true)
 			})
 			.on('end', () => {
 				console.log('6 - Conversão do audio concluido!');
+				socket.emit('loading_audio', false)
 			})
 			.on('error', (err: Error) => {
 				console.error('erro aqui na conversao', err);
@@ -30,7 +33,7 @@ async function convertToMp3(stream: Stream, fileName: string, socket) {
 
 		ffstream.on('end', async function () {
 			const outputBuffer = Buffer.concat(buffers);
-			socket.emit('buffer', outputBuffer)
+			socket.emit('buffer', outputBuffer, fileName)
 
 			//const buffer = Buffer.from(outputBuffer);
 
