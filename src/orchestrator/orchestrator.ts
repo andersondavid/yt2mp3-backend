@@ -7,7 +7,10 @@ import getDataFromYT from '../services/getVideoData';
 
 async function orchestrator(socket: Socket) {
 	socket.on('start_url', async (dataUrl) => {
-		const options = JSON.parse(dataUrl)
+		const options = dataUrl
+
+		console.log('options', options);
+		
 
 		const dataFromYt = await getDataFromYT(options);
 		console.log(dataFromYt.videoDetails.title);
@@ -16,7 +19,7 @@ async function orchestrator(socket: Socket) {
 
 		const fileName = await createFileName(dataFromYt);
 		const stream = downloadStream(options);
-		const fileConverted = await convertToMp3(stream, fileName);
+		const fileConverted = await convertToMp3(stream, fileName, socket);
 
 		socket.emit('file_converted', fileConverted);
 	});

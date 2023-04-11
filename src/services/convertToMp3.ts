@@ -3,7 +3,7 @@ import fs from 'fs';
 
 import ffmpeg from '../libs/ffmpeg';
 
-async function convertToMp3(stream: Stream, fileName: string) {
+async function convertToMp3(stream: Stream, fileName: string, socket) {
 	const fileConverted = `temp/${fileName}.mp3`;
 
 	try {
@@ -14,20 +14,12 @@ async function convertToMp3(stream: Stream, fileName: string) {
 			.on('start', () => {
 				console.log('5 - Conversão iniciada!');
 			})
-			.on('progress', (progress) => {
-				console.log('Processing: ' + JSON.stringify(progress) + '% done');
-				process.stdout.write('\x1b[1A');
-			})
 			.on('end', () => {
 				console.log('6 - Conversão do audio concluido!');
 			})
 			.on('error', (err: Error) => {
 				console.error('erro aqui na conversao', err);
 			});
-
-		streamConverted.ffprobe((err, data) => {
-			console.log('Informações da Stream:', data.streams[0]);
-		});
 
 		const ffstream = streamConverted.pipe();
 
@@ -38,12 +30,14 @@ async function convertToMp3(stream: Stream, fileName: string) {
 
 		ffstream.on('end', async function () {
 			const outputBuffer = Buffer.concat(buffers);
-			const buffer = Buffer.from(outputBuffer);
+			socket.emit('buffer', outputBuffer)
 
-			fs.writeFile(fileConverted, buffer, (err) => {
+			//const buffer = Buffer.from(outputBuffer);
+
+			/*fs.writeFile(fileConverted, buffer, (err) => {
 				if (err) throw err;
 				console.log('7 - Arquivo criado com sucesso!');
-			});
+			});*/
 		});
 
 		return fileConverted;
