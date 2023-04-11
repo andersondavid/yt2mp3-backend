@@ -1,7 +1,4 @@
-import getDataFromYT from "../services/getVideoData";
-
-async function createFileName(url:string) {
-		const videoData = await getDataFromYT(url)
+async function createFileName(videoData) {
 		const videoTitle: string = videoData.videoDetails.title
 		const removeEspecialChar = videoTitle.replace(/\s+/g, '_')
 		const shortenNname = removeEspecialChar.substring(0, 20)

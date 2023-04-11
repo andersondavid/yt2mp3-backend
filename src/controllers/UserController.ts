@@ -1,34 +1,29 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { Socket } from 'socket.io';
+import orchestrator from '../orchestrator/orchestrator';
 
-import downloadStream from '../services/downloadStream';
-import convertToMp3 from '../services/convertToMp3';
-import socketService from '../services/socketService';
 
 export const UserController = {
-	async startService(req: Request, res: Response) {
-		const url = req.body.url;
-
-		const stream = await downloadStream(url);
-		const conveter = await convertToMp3(stream);
-
-		res.json({
-			status: 'ok',
-		});
-	},
-
 	async socket(req, res: Response) {
-		const time = Date.now().toString();
+		console.log('1 - Resquet recebida')
 
 		const { Server, httpServer } = req.io;
-		const io = new Server(httpServer, {
-			cors: {
-				origin: '*',
-			}
-		})
-		//const io = req.io
+		try {
+			const io = new Server(httpServer, { cors: { origin: '*' } });
+			io.on('connection', (socket: Socket) => {
+				console.log('2 - Usuário conectado', socket.id);
 
-		socketService(io, time);
+				orchestrator(socket)
 
-		res.json({ msg: 'Conexão do chat iniciada!' });
+				socket.on('disconnect', () => {
+					socket.disconnect();
+					console.log('Usuário desconectado', socket.id);
+				});
+			});
+		} catch (error) {
+			console.error("Socket IO não conectado.")
+		}
+
+		res.json({ status: 'Connect OK' });
 	},
 };

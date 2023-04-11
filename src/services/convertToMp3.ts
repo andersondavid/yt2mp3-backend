@@ -1,22 +1,33 @@
 import { Stream } from 'stream';
-import ffmpeg from '../libs/ffmpeg';
-import fs from 'fs'
+import fs from 'fs';
 
-async function convertToMp3(stream: Stream) {
+import ffmpeg from '../libs/ffmpeg';
+
+async function convertToMp3(stream: Stream, fileName: string) {
+	const fileConverted = `temp/${fileName}.mp3`;
+
 	try {
 		const streamConverted = ffmpeg(stream)
 			//.save(pathAudioFile + audioFileName)
 			.audioBitrate(192)
 			.format('mp3')
 			.on('start', () => {
-				console.log('Conversão iniciada!');
+				console.log('5 - Conversão iniciada!');
+			})
+			.on('progress', (progress) => {
+				console.log('Processing: ' + JSON.stringify(progress) + '% done');
+				process.stdout.write('\x1b[1A');
 			})
 			.on('end', () => {
-				console.log('Conversão do audio concluido!');
+				console.log('6 - Conversão do audio concluido!');
 			})
-			.on('error', (err) => {
+			.on('error', (err: Error) => {
 				console.error('erro aqui na conversao', err);
 			});
+
+		streamConverted.ffprobe((err, data) => {
+			console.log('Informações da Stream:', data.streams[0]);
+		});
 
 		const ffstream = streamConverted.pipe();
 
@@ -27,15 +38,15 @@ async function convertToMp3(stream: Stream) {
 
 		ffstream.on('end', async function () {
 			const outputBuffer = Buffer.concat(buffers);
-			const caminhoArquivo = 'temp/musica.mp3';
 			const buffer = Buffer.from(outputBuffer);
 
-			fs.writeFile(caminhoArquivo, buffer, (err) => {
+			fs.writeFile(fileConverted, buffer, (err) => {
 				if (err) throw err;
-				console.log('Arquivo criado com sucesso!');
+				console.log('7 - Arquivo criado com sucesso!');
 			});
-		});		
+		});
 
+		return fileConverted;
 	} catch (error) {
 		throw new error(error);
 	}
