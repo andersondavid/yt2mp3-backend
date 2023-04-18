@@ -5,7 +5,7 @@ async function getBasicInfo(options: { url: string }) {
 
 	try {
 		const videoInfo = await ytdl.getBasicInfo(url);
-		console.log('4 - Informções do video carregadas');
+		console.log('Informções do video carregadas');
 		return videoInfo;
 	} catch (error) {
 		console.error('ERRO: getBasicInfo');
