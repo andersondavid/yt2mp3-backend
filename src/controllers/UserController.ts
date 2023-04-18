@@ -24,6 +24,6 @@ export const UserController = {
 			console.error("Socket IO não conectado.")
 		}
 
-		res.json({ status: 'Connect OK' });
+		res.json({ status: 'REQUEST_STATUS_OK' });
 	},
 };

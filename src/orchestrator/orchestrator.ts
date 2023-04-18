@@ -15,7 +15,7 @@ async function orchestrator(socket: Socket) {
 		const dataFromYt = await getDataFromYT(options);
 		console.log(dataFromYt.videoDetails.title);
 		
-		socket.emit('video_name', dataFromYt.videoDetails.title);
+		socket.emit('send_info', dataFromYt);
 
 		const fileName = await createFileName(dataFromYt);
 		const stream = downloadStream(options);

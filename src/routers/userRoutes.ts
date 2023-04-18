@@ -3,6 +3,6 @@ import { UserController } from '../controllers/UserController';
 
 const router = Router();
 
-router.post('/io/', UserController.socket);
+router.get('/io/', UserController.socket);
 
 export default router;
