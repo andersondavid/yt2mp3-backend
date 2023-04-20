@@ -1,12 +1,10 @@
 import { Stream } from 'stream';
-//import { Socket } from 'socket.io';
 
 import ffmpeg from '../libs/ffmpeg';
-let buffer;
 
 async function convertToMp3(stream: Stream) {
-	try {
-		const streamConverted = await ffmpeg(stream)
+	const convertPromise = new Promise((resolve, reject) => {
+		const streamConverted = ffmpeg(stream)
 			.audioBitrate(192)
 			.format('mp3')
 			.on('start', () => {
@@ -15,12 +13,10 @@ async function convertToMp3(stream: Stream) {
 			})
 			.on('end', () => {
 				console.log('6 - Conversão do audio concluido!');
-				return 'bom dia';
-
 				//	socket.emit('loading_audio', false)
 			})
 			.on('error', (err: Error) => {
-				console.error('erro aqui na conversao', err);
+				reject(err)
 			});
 
 		const ffstream = streamConverted.pipe();
@@ -32,11 +28,18 @@ async function convertToMp3(stream: Stream) {
 
 		ffstream.on('end', function () {
 			const outputBuffer = Buffer.concat(buffers);
-			return 'bom dia';
+			resolve(outputBuffer);
+			console.log('RESOLVER', outputBuffer);
+			
 		});
-	} catch (error) {
-		throw new error(error);
-	}
+	});
+
+	return convertPromise
+		.then((outputBuffer) => {
+			console.log('PROMISSE', outputBuffer);
+			return outputBuffer
+		})
+		.catch((error) => console.error(error));
 }
 
 export default convertToMp3;

@@ -18,13 +18,9 @@ async function socket(io: Server) {
 				const stream = await loadStream(options);
 				socket.emit('loading_audio', true);
 
-				// convertToMp3(stream).then((buffer) => {
-				// 	console.log('fileConverted', buffer);
-				// 	socket.emit('buffer', 'buffer');
-				// });
-
 				const buffer = await convertToMp3(stream)
-				console.log('fileConverted', buffer)
+				socket.emit('buffer', buffer);
+				socket.emit('loading_audio', false)
 				
 			});
 			socket.on('disconnect', () => {
