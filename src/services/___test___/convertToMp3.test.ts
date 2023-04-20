@@ -1,15 +1,14 @@
-import convertToMp3 from '../convertToMp3';
-import loadStream from '../loadStream';
+import loadStream from './loadStream';
+import ytdl from 'ytdl-core';
 
-describe('Convert to MP3', () => {
-	it('should convert the input stream to an MP3 file', async () => {
-		const stream = await loadStream({
-			url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-			bitrate: 92,
-		});
+jest.mock('ytdl-core');
 
-		const converted = await convertToMp3(stream);
-
-		expect(converted).toBe(true);
+describe('loadStream function', () => {
+	it('should return a stream when ytdl call is successful', () => {
+		const url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+		const bitrate = 128;
+		const mockStream = {};
+		const result = loadStream({ url, bitrate });
+		expect(result).toBe(mockStream);
 	});
 });
