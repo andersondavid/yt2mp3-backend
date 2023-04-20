@@ -1,29 +1,7 @@
-import { Response } from 'express';
-import { Socket } from 'socket.io';
-import orchestrator from '../orchestrator/orchestrator';
-
+import { Request, Response } from 'express';
 
 export const UserController = {
-	async socket(req, res: Response) {
-		console.log('1 - Resquet recebida')
-
-		const { Server, httpServer } = req.io;
-		try {
-			const io = new Server(httpServer, { cors: { origin: '*' } });
-			io.on('connection', (socket: Socket) => {
-				console.log('2 - Usuário conectado', socket.id);
-
-				orchestrator(socket)
-
-				socket.on('disconnect', () => {
-					socket.disconnect();
-					console.log('Usuário desconectado', socket.id);
-				});
-			});
-		} catch (error) {
-			console.error("Socket IO não conectado.")
-		}
-
+	async socket(req: Request, res: Response) {
 		res.json({ status: 'REQUEST_STATUS_OK' });
 	},
 };
