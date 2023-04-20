@@ -1,24 +1,23 @@
 import { Stream } from 'stream';
-import fs from 'fs';
+//import { Socket } from 'socket.io';
 
 import ffmpeg from '../libs/ffmpeg';
-import { Socket } from 'socket.io';
+let buffer;
 
-async function convertToMp3(stream: Stream, fileName: string, socket: Socket) {
-	const fileConverted = `temp/${fileName}.mp3`;
-
+async function convertToMp3(stream: Stream) {
 	try {
-		const streamConverted = ffmpeg(stream)
-			//.save(pathAudioFile + audioFileName)
+		const streamConverted = await ffmpeg(stream)
 			.audioBitrate(192)
 			.format('mp3')
 			.on('start', () => {
 				console.log('5 - Conversão iniciada!');
-				socket.emit('loading_audio', true)
+				//socket.emit('loading_audio', true)
 			})
 			.on('end', () => {
 				console.log('6 - Conversão do audio concluido!');
-				socket.emit('loading_audio', false)
+				return 'bom dia';
+
+				//	socket.emit('loading_audio', false)
 			})
 			.on('error', (err: Error) => {
 				console.error('erro aqui na conversao', err);
@@ -31,19 +30,10 @@ async function convertToMp3(stream: Stream, fileName: string, socket: Socket) {
 			buffers.push(buf);
 		});
 
-		ffstream.on('end', async function () {
+		ffstream.on('end', function () {
 			const outputBuffer = Buffer.concat(buffers);
-			socket.emit('buffer', outputBuffer, fileName)
-
-			//const buffer = Buffer.from(outputBuffer);
-
-			/*fs.writeFile(fileConverted, buffer, (err) => {
-				if (err) throw err;
-				console.log('7 - Arquivo criado com sucesso!');
-			});*/
+			return 'bom dia';
 		});
-
-		return fileConverted;
 	} catch (error) {
 		throw new error(error);
 	}
