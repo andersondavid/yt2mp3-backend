@@ -1,5 +1,4 @@
-import loadStream from './loadStream';
-import ytdl from 'ytdl-core';
+import loadStream from '../loadStream';
 
 jest.mock('ytdl-core');
 
